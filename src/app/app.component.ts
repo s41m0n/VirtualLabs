@@ -21,9 +21,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   dataSource = new MatTableDataSource<Student>(STUDENTS_DB.slice(0, Math.ceil(STUDENTS_DB.length/2)));
   selection = new SelectionModel<Student>(true, []);
   colsToDisplay = ["select", "id", "name", "firstName"];
-  filteredOptions: Observable<string[]>;
+  filteredOptions: Observable<Student[]>;
   addStudentControl = new FormControl();
-  studentToAdd: string = '';
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -75,27 +74,29 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   /** Function to add Student to Course */
   fireAddStudent() {
-    if(this.studentToAdd === '') {
+    const studentToAdd = this.addStudentControl.value;
+
+    if(!(studentToAdd instanceof Object)) {
       alert("No student selected");
       return;
     }
-    if(this.dataSource.data.find(s => s.id === this.studentToAdd)) {
-      alert(`Student ${this.studentToAdd} already in course`);
+    if(this.dataSource.data.find(s => s.id === studentToAdd.id)) {
+      alert(`Student ${studentToAdd.id} already in course`);
       return;
     }
-    this.dataSource.data = this.dataSource.data.concat(STUDENTS_DB.find(s => s.id === this.studentToAdd));
-    alert(`Successfully added student ${this.studentToAdd}`);
+    this.dataSource.data = this.dataSource.data.concat(studentToAdd);
+    alert(`Successfully added student ${studentToAdd.id}`);
   }
 
-  /** Function to set the Student to add */
-  setSelectedStudentToAdd(student: string) {
-    this.studentToAdd = student;
+  displayFn(student: Student): string{
+    return student? student.id : '';
   }
 
   /** My FormControl filter */
-  private _filter(value: string): string[] {
+  private _filter(value: string | Object): Student[] {
+    if(value instanceof Object) return;
     const filterValue = value.toLowerCase();
-    return STUDENTS_DB.filter((option: { id: string; }) => option.id.toLowerCase().includes(filterValue)).map((option: { id: any; }) => option.id);
+    return STUDENTS_DB.filter(s => s.id.toLowerCase().includes(filterValue));
   }
 }
 

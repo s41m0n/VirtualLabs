@@ -35,9 +35,9 @@
                      value=""
                      [formControl]="addStudentControl"
                      [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setSelectedStudentToAdd($event.option.value)">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                 <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                  {{option}}
+                  {{option.id}}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
