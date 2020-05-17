@@ -6,35 +6,26 @@ import { STUDENTS_DB } from './shared/mocks/mock-student';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit, OnInit{
+export class AppComponent implements AfterViewInit{
   title = 'ai20-lab04';
   dataSource = new MatTableDataSource<Student>(STUDENTS_DB.slice(0, Math.ceil(STUDENTS_DB.length/2)));
   selection = new SelectionModel<Student>(true, []);
   colsToDisplay = ["select", "id", "name", "firstName"];
-  filteredOptions: Observable<string[]>;
+  filteringOptions: Student[] = STUDENTS_DB;
   addStudentControl = new FormControl();
-  studentToAdd: string = '';
+  studentToAdd: Student;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-
-  /** Setting filter to autocomplete */
-  ngOnInit() {
-    this.filteredOptions = this.addStudentControl.valueChanges
-    .pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
-  }
+  @ViewChild(MatSidenav) sidenav: MatSidenav;
 
   /** Setting properties after ng containers are initialized */
   ngAfterViewInit() {
@@ -43,10 +34,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+  isAllSelected() : boolean{
+    return this.dataSource.data.length === this.selection.selected.length;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
@@ -66,36 +55,50 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   /** Delete rows with checkbox selected */
   deleteSelected() {
-    if(this.selection.selected.length) {
-      let newDataSource = this.dataSource.data.filter( el => !this.selection.selected.includes( el ));
-      this.dataSource.data = newDataSource;
-      //this.selection = new SelectionModel<Student>(true, []);
+    if(!this.selection.selected.length) {
+      alert('There are not student selected');
+      return;
     }
+    this.dataSource.data = this.dataSource.data.filter( el => !this.selection.selected.includes( el ));
+    this.selection.clear();
+    alert('Successfully deleted student(s)');
+  }
+
+  /** Function to toggle the sidebar */
+  toggleSidebar() {
+    console.log('Toggle sidenav');
+    this.sidenav.toggle();
   }
 
   /** Function to add Student to Course */
   fireAddStudent() {
-    if(this.studentToAdd === '') {
-      alert("No student selected");
+    if(!this.studentToAdd) {
+      alert('No student selected');
       return;
     }
-    if(this.dataSource.data.find(s => s.id === this.studentToAdd)) {
-      alert(`Student ${this.studentToAdd} already in course`);
+    if(this.dataSource.data.find(s => s.id === this.studentToAdd.id)) {
+      alert(`Student ${this.studentToAdd.id} already in course`);
       return;
     }
-    this.dataSource.data = this.dataSource.data.concat(STUDENTS_DB.find(s => s.id === this.studentToAdd));
-    alert(`Successfully added student ${this.studentToAdd}`);
+    this.dataSource.data = this.dataSource.data.concat(STUDENTS_DB.find(s => s.id === this.studentToAdd.id));
+    alert(`Successfully added student ${this.studentToAdd.id}`);
   }
 
   /** Function to set the Student to add */
-  setSelectedStudentToAdd(student: string) {
+  setSelectedStudentToAdd(student: Student) {
     this.studentToAdd = student;
   }
 
+  /** Function to set the displayed student value (only the id) */
+  displayOption(student: Student) : string {
+    return student? student.id : '';
+  }
+
   /** My FormControl filter */
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return STUDENTS_DB.filter((option: { id: string; }) => option.id.toLowerCase().includes(filterValue)).map((option: { id: any; }) => option.id);
+  filter() {
+    console.log('Filtering');
+    const filterValue = this.addStudentControl.value.toLowerCase();
+    this.filteringOptions = STUDENTS_DB.filter(s => s.id.toLowerCase().includes(filterValue));
   }
 }
 

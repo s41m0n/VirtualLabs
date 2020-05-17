@@ -1,5 +1,5 @@
 <mat-toolbar color='primary'>
-  <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
+  <button mat-icon-button aria-label="Menu icon" (click)="toggleSidebar()">
     <mat-icon>menu</mat-icon>
   </button>
   VirtualLabs
@@ -10,7 +10,7 @@
 </mat-toolbar>
 
 <mat-sidenav-container>
-  <mat-sidenav #sidebar mode="side" opened="true" position="start">
+  <mat-sidenav mode="side" opened="false" position="start">
     <div class="container">
       <mat-nav-list>
         <mat-list-item >Internet Applications</mat-list-item>
@@ -34,10 +34,11 @@
                      matInput
                      value=""
                      [formControl]="addStudentControl"
-                     [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setSelectedStudentToAdd($event.option.value)">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                  {{option}}
+                     [matAutocomplete]="auto"
+                     (keyup)="filter()">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setSelectedStudentToAdd($event.option.value)" [displayWith]="displayOption">
+                <mat-option *ngFor="let option of filteringOptions" [value]="option">
+                  {{option.id}}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
