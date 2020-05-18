@@ -21,7 +21,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   title = 'ai20-lab04';
   dataSource = new MatTableDataSource<Student>(STUDENTS_DB.slice(0, Math.ceil(STUDENTS_DB.length/2)));
   selection = new SelectionModel<Student>(true, []);
-  colsToDisplay = ["select", "id", "name", "firstName"];
+  colsToDisplay = ["select", "id", "name", "firstName", "team"];
   filteredOptions: Observable<Student[]>;
   addStudentControl = new FormControl();
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -68,37 +68,39 @@ export class AppComponent implements AfterViewInit, OnInit{
   deleteSelected() {
     if(this.selection.selected.length) {
       this.dataSource.data = this.dataSource.data.filter( student => !this.selection.selected.includes( student ));
+      this._showMsg(`😃 Successfully deleted student${this.selection.selected.length > 1 ? 's' : ` ${this.displayFn(this.selection.selected[0])}`}`);
       this.selection.clear();
-      this._showMsg("Successfully deleted student(s)");
     }
   }
 
   /** Function to add Student to Course */
   addStudent() {
     const studentToAdd = this.addStudentControl.value;
-
-    if(!studentToAdd || typeof studentToAdd === 'string') {
-      this._showMsg("Please select one student between the options");
+    this.addStudentControl.setValue('');
+    if(!studentToAdd) {
+      return;
+    }
+    if(typeof studentToAdd === 'string') {
+      this._showMsg("⛔ Please select one student between the options");
       return;
     }
     if(this.dataSource.data.find(s => s.id === studentToAdd.id)) {
-      this._showMsg(`Student ${studentToAdd.id} already in course`);
+      this._showMsg(`⛔ Student ${this.displayFn(studentToAdd)} already in course`);
       return;
     }
     this.dataSource.data = this.dataSource.data.concat(studentToAdd);
-    this.addStudentControl.setValue('');
-    this._showMsg(`Successfully added student ${studentToAdd.id}`);
+    this._showMsg(`😃 Successfully added student ${this.displayFn(studentToAdd)}`);
   }
 
-  /** Function to set the value displayed in mat-options */
+  /** Function to set the value displayed in input and mat-options */
   displayFn(student: Student): string{
-    return student? student.id : '';
+    return student? `${student.name} ${student.firstName} (${student.id})` : '';
   }
 
   /** My FormControl filter */
   private _filter(value: string): Student[] {
     const filterValue = value.toLowerCase();
-    return STUDENTS_DB.filter(s => s.id.toLowerCase().includes(filterValue));
+    return STUDENTS_DB.filter(s => s.firstName.toLowerCase().includes(filterValue));
   }
 
   /** Function to show status message after actions */
