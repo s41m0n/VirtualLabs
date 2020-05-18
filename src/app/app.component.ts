@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
@@ -26,12 +27,15 @@ export class AppComponent implements AfterViewInit, OnInit{
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  constructor(private _snackBar : MatSnackBar) {}
+
   /** Setting filter to autocomplete */
   ngOnInit() {
     this.filteredOptions = this.addStudentControl.valueChanges
     .pipe(
       startWith(''),
-      map(value => this._filter(value))
+      map(value => typeof value === 'string' ? value : value.id),
+      map(id => id ? this._filter(id) : STUDENTS_DB.slice())
     );
   }
 
@@ -42,10 +46,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+  isAllSelected() : boolean{
+    return this.selection.selected.length === this.dataSource.data.length;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
@@ -57,46 +59,55 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   /** The label for the checkbox on the passed row */
   checkboxLabel(row?: Student): string {
-    if (!row) {
+    if (!row)
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-    }
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id}`;
   }
 
   /** Delete rows with checkbox selected */
   deleteSelected() {
     if(this.selection.selected.length) {
-      let newDataSource = this.dataSource.data.filter( el => !this.selection.selected.includes( el ));
-      this.dataSource.data = newDataSource;
-      //this.selection = new SelectionModel<Student>(true, []);
+      this.dataSource.data = this.dataSource.data.filter( student => !this.selection.selected.includes( student ));
+      this.selection.clear();
+      this._showMsg("Successfully deleted student(s)");
     }
   }
 
   /** Function to add Student to Course */
-  fireAddStudent() {
+  addStudent() {
     const studentToAdd = this.addStudentControl.value;
 
-    if(!(studentToAdd instanceof Object)) {
-      alert("No student selected");
+    if(!studentToAdd || typeof studentToAdd === 'string') {
+      this._showMsg("Please select one student between the options");
       return;
     }
     if(this.dataSource.data.find(s => s.id === studentToAdd.id)) {
-      alert(`Student ${studentToAdd.id} already in course`);
+      this._showMsg(`Student ${studentToAdd.id} already in course`);
       return;
     }
     this.dataSource.data = this.dataSource.data.concat(studentToAdd);
-    alert(`Successfully added student ${studentToAdd.id}`);
+    this.addStudentControl.setValue('');
+    this._showMsg(`Successfully added student ${studentToAdd.id}`);
   }
 
+  /** Function to set the value displayed in mat-options */
   displayFn(student: Student): string{
     return student? student.id : '';
   }
 
   /** My FormControl filter */
-  private _filter(value: string | Object): Student[] {
-    if(value instanceof Object) return;
+  private _filter(value: string): Student[] {
     const filterValue = value.toLowerCase();
     return STUDENTS_DB.filter(s => s.id.toLowerCase().includes(filterValue));
+  }
+
+  /** Function to show status message after actions */
+  private _showMsg(message : string, ) {
+    this._snackBar.open(message, 'Close', {
+      duration: 5000,
+      verticalPosition: 'bottom',
+      horizontalPosition: 'center'
+    })
   }
 }
 

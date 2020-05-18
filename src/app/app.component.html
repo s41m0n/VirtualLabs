@@ -1,3 +1,4 @@
+<!-- First toolbar with menu icon and app name -->
 <mat-toolbar color='primary'>
   <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
     <mat-icon>menu</mat-icon>
@@ -5,12 +6,16 @@
   VirtualLabs
 </mat-toolbar>
 
+<!-- Second toolbar with current selected course name -->
 <mat-toolbar>
   Internet Applications
 </mat-toolbar>
 
+<!-- Application views area -->
 <mat-sidenav-container>
-  <mat-sidenav #sidebar mode="side" opened="true" position="start">
+
+  <!-- Left sidenav to choose current view course -->
+  <mat-sidenav #sidebar mode="side" opened="false" position="start">
     <div class="container">
       <mat-nav-list>
         <mat-list-item >Internet Applications</mat-list-item>
@@ -19,12 +24,18 @@
     </div>
   </mat-sidenav>
 
+  <!-- Current view content -->
   <mat-sidenav-content>
+
+    <!-- Tabs for the current view (Students / Teams) -->
     <mat-tab-group>
-      <mat-tab label="Studenti"> 
+
+      <!-- Students tab -->
+      <mat-tab label="Students"> 
         <div class="container">
           <h3>Enrolled students</h3>
 
+          <!-- Add student input field with autocomplete -->
           <div class="container">
             <mat-form-field>
               <mat-label>Add Student</mat-label>
@@ -41,14 +52,16 @@
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
-            <button mat-button (click)="fireAddStudent()">Add</button>
+            <button mat-button (click)="addStudent()">Add</button>
           </div>
 
+          <!-- Delete student button -->
           <button mat-button (click)="deleteSelected()">Delete Selected</button>
 
+          <!-- Students in course table -->
           <table mat-table [dataSource]="dataSource" matSort>
 
-            <!-- Checkbox Column -->
+            <!-- Checkbox Column description-->
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="$event ? masterToggle() : null"
@@ -89,15 +102,17 @@
           </table>
         </div>
         
+        <!-- Table data paginator -->
         <mat-paginator [length]="dataSource.data.length"
               [pageSize]="5"
               [pageSizeOptions]="[5, 10, 25, 100]">
         </mat-paginator>
-
       </mat-tab>
-      <mat-tab label="Gruppi">
+
+      <!-- Teams tab-->
+      <mat-tab label="Teams">
         <div class="container">
-          Content 2 
+          Work in progres ...
         </div>
       </mat-tab>
     </mat-tab-group>
