@@ -18,10 +18,14 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { StudentsComponent } from './teacher/students/students.component';
+import { StudentsContComponent } from './teacher/students-cont.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    StudentsComponent,
+    StudentsContComponent
   ],
   imports: [
     BrowserModule,
