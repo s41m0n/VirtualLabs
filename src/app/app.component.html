@@ -3,7 +3,9 @@
   <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
     <mat-icon>menu</mat-icon>
   </button>
-  VirtualLabs
+  <a mat-button id='homeLink' [routerLink]="['home']">
+    VirtualLabs
+  </a>
 </mat-toolbar>
 
 <!-- Second toolbar with current selected course name -->
@@ -18,29 +20,28 @@
   <mat-sidenav #sidebar mode="side" opened="true" position="start">
     <div class="container">
       <mat-nav-list>
-        <mat-list-item >Internet Applications</mat-list-item>
-        <mat-list-item >System and Device programming</mat-list-item>
+        <mat-list-item [routerLink]="['teacher/course/internet-applications/students']" >Internet Applications</mat-list-item>
+        <mat-list-item [routerLink]="['teacher/course/system-and-device-programming/students']" >System and Device programming</mat-list-item>
       </mat-nav-list>
     </div>
   </mat-sidenav>
 
   <!-- Current view content -->
   <mat-sidenav-content>
+    <!-- Tabs for the current view (Students / Teams / VMs) -->
+    <nav mat-tab-nav-bar>
+      <a mat-tab-link
+        *ngFor="let link of navLinks"
+        [routerLink]="link.path"
+        routerLinkActive #rla="routerLinkActive"
+        [active]="rla.isActive">
+        {{link.label}}
+      </a>
+    </nav>
 
-    <!-- Tabs for the current view (Students / Teams) -->
-    <mat-tab-group>
-
-      <!-- Students tab -->
-      <mat-tab label="Students"> 
-        <app-students-cont></app-students-cont>
-      </mat-tab>
-
-      <!-- Teams tab-->
-      <mat-tab label="Teams">
-        <div class="container">
-          See you in the next lab :D
-        </div>
-      </mat-tab>
-    </mat-tab-group>
+    <div class="container tab-content">
+      <router-outlet></router-outlet>
+    </div>
+    
   </mat-sidenav-content>
 </mat-sidenav-container>

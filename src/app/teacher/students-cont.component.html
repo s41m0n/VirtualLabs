@@ -1,1 +1,2 @@
-<app-students [enrolledStudents]="enrolledStudents" [studentsDB]="studentDB"></app-students>
+<app-students [enrolledStudents]="enrolledStudents" [studentsDB]="studentDB" 
+(removeStudentsEvent)="unenrollStudents($event)" (addStudentsEvent)="enrollStudents($event)"></app-students>

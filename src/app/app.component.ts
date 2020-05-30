@@ -6,6 +6,18 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent{
-  title = 'ai20-lab04';
+  title = 'ai20-lab05';
+  navLinks = [
+    {
+      label: 'Students',
+      path: 'teacher/course/internet-applications/students'
+    }, {
+      label: 'Vms',
+      path: 'teacher/course/internet-applications/vms'
+    }, {
+      label: 'Assignments',
+      path: 'teacher/course/internet-applications/assignments'
+    }, 
+  ]
 }
 

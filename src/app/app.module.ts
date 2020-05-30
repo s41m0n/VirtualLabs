@@ -20,6 +20,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { StudentsComponent } from './teacher/students/students.component';
 import { StudentsContComponent } from './teacher/students-cont.component';
+import { AppRoutingModule } from './app-routing-module';
+import { HttpClientModule }    from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { StudentsContComponent } from './teacher/students-cont.component';
     MatAutocompleteModule,
     MatSortModule,
     MatPaginatorModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
