@@ -1,6 +1,5 @@
-import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -10,9 +9,7 @@ import { take } from 'rxjs/operators';
     </h2>
   `
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   path: string;
   constructor(private route: ActivatedRoute) {}
-  ngOnInit() {
-  }
 }

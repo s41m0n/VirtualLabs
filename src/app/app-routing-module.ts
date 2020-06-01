@@ -5,11 +5,12 @@ import { StudentsContComponent } from './teacher/students-cont.component';
 import { PageNotFoundComponent } from './PageNotFoundComponent';
 import { HomeComponent } from './HomeComponent';
 import { VmsContComponent } from './teacher/vms-cont.component';
+import { AuthGuard } from './helpers/auth.guard';
 
 const routes = [
     { path: 'home', component: HomeComponent},
-    { path:'teacher/course/internet-applications/students', component: StudentsContComponent},
-    { path:'teacher/course/internet-applications/vms', component:  VmsContComponent},
+    { path:'teacher/course/internet-applications/students', component: StudentsContComponent, canActivate: [AuthGuard]},
+    { path:'teacher/course/internet-applications/vms', component:  VmsContComponent, canActivate: [AuthGuard]},
     { path: '',   redirectTo: 'home', pathMatch: 'full' },
     { path:'**', component: PageNotFoundComponent}
 ];

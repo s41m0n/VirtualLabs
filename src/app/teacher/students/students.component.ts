@@ -7,7 +7,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import {map, startWith, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
-import { Student } from '../../shared/models/student.model';
+import { Student } from '../../models/student.model';
 
 @Component({
   selector: 'app-students',

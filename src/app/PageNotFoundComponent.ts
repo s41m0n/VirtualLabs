@@ -1,18 +1,15 @@
-import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-home',
+  selector: 'page-not-found',
   template: `
     <h2>
       404 - Not Found
     </h2>
   `
 })
-export class PageNotFoundComponent implements OnInit {
+export class PageNotFoundComponent {
   path: string;
   constructor(private route: ActivatedRoute) {}
-  ngOnInit() {
-  }
 }

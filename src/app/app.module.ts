@@ -21,13 +21,19 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { StudentsComponent } from './teacher/students/students.component';
 import { StudentsContComponent } from './teacher/students-cont.component';
 import { AppRoutingModule } from './app-routing-module';
-import { HttpClientModule }    from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
+import { MatDialogModule } from '@angular/material/dialog';
+import { LoginDialogComponent } from './auth/login-dialog.component';
+import { MatCardModule } from '@angular/material/card';
+import { BasicAuthInterceptor } from './helpers/basic-auth.interceptor';
+import { ErrorInterceptor } from './helpers/error.interceptor';
 
 @NgModule({
   declarations: [
     AppComponent,
     StudentsComponent,
-    StudentsContComponent
+    StudentsContComponent,
+    LoginDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -46,10 +52,18 @@ import { HttpClientModule }    from '@angular/common/http';
     MatSortModule,
     MatPaginatorModule,
     MatSnackBarModule,
+    MatDialogModule,
+    MatCardModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
   ],
-  providers: [],
+  entryComponents: [
+    LoginDialogComponent
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

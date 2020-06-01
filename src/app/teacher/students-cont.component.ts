@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Student } from '../shared/models/student.model';
+import { Student } from '../models/student.model';
 import { SnackBarService } from '../services/snack-bar.service';
 import { StudentService } from '../services/student.service';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-students-cont',
@@ -19,16 +20,20 @@ export class StudentsContComponent implements OnInit{
 
   ngOnInit(): void {
     this._studentService.getStudents()
+      .pipe(first())
       .subscribe(students => this.studentDB = students);
     this._studentService.getEnrolledStudents()
+      .pipe(first())
       .subscribe(students => this.enrolledStudents = students);
   }
 
   unenrollStudents(students: Student[]) {
-    this._studentService.unenrollStudents(students).subscribe(succUnenrolled => {
-      this.enrolledStudents = this.enrolledStudents.filter(s => !succUnenrolled.includes(s));
-      if(students.length === succUnenrolled.length) this._snackBarService.show(`😃 Successfully unrolled student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
-      else this._snackBarService.show(`⛔ Fail unenroll student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
+    this._studentService.unenrollStudents(students)
+      .pipe(first())
+      .subscribe(succUnenrolled => {
+        this.enrolledStudents = this.enrolledStudents.filter(s => !succUnenrolled.some(x => x.id === s.id));
+        if(students.length === succUnenrolled.length) this._snackBarService.show(`😃 Successfully unenrolled student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
+        else this._snackBarService.show(`⛔ Fail unenroll student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
     });
   }
 
@@ -46,10 +51,12 @@ export class StudentsContComponent implements OnInit{
         return;
       } 
     }
-    this._studentService.enrollStudents(students).subscribe(succEnrolled => {
-      this.enrolledStudents = this.enrolledStudents.concat(succEnrolled);
-      if(students.length === succEnrolled.length) this._snackBarService.show(`😃 Successfully enrolled student${students.length > 1? 's' : ` ${students[0].serial}`}`);
-      else this._snackBarService.show(`⛔ Fail enroll student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
+    this._studentService.enrollStudents(students)
+      .pipe(first())
+      .subscribe(succEnrolled => {
+        this.enrolledStudents = this.enrolledStudents.concat(succEnrolled);
+        if(students.length === succEnrolled.length) this._snackBarService.show(`😃 Successfully enrolled student${students.length > 1? 's' : ` ${students[0].serial}`}`);
+        else this._snackBarService.show(`⛔ Fail enroll student${students.length > 1 ? 's' : ` ${students[0].serial}`}`);
     });
   }
 }
