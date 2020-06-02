@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { Role } from '../models/role.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,7 @@ export class AuthService {
 
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
-  loginURL : string = 'http://localhost:3000/login';
-  httpOptions = {headers: new HttpHeaders({ 'Content-Type': 'application/json' })};
+  httpOptions = {headers: new HttpHeaders({ 'Content-Type': 'application/json'})};
 
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
@@ -24,10 +24,11 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<any>(this.loginURL, {'email': email, 'password': password}, this.httpOptions).pipe(
+    return this.http.post<any>('api/login', {'email': email, 'password': password}, this.httpOptions).pipe(
       map(authResult => {
         // store user details and basic auth credentials in local storage to keep user logged in between page refreshes
-        const user = new User(email, authResult.accessToken);
+        // Assigning the Admin Role since json-server-auth is not able to assign it directly in the jwt token
+        const user = new User(email, authResult.accessToken, Role.Professor);
         localStorage.setItem('currentUser', JSON.stringify(user));
         this.currentUserSubject.next(user);
         return authResult;

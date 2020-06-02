@@ -12,7 +12,7 @@ export class StudentService {
 
   enrolledStudents : Student[] = [];
   studentDB : Student[] = [];
-  baseURL : string = 'http://localhost:3000';
+  baseURL : string = 'api/';
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
