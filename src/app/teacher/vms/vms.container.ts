@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-vms-cont',
-  templateUrl: './vms-cont.component.html',
-  styleUrls: ['./vms-cont.component.css']
+  templateUrl: './vms.container.html'
 })
 export class VmsContComponent implements OnInit {
 

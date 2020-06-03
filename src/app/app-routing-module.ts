@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
-import { StudentsContComponent } from './teacher/students-cont.component';
-import { PageNotFoundComponent } from './PageNotFoundComponent';
-import { HomeComponent } from './HomeComponent';
-import { VmsContComponent } from './teacher/vms-cont.component';
+import { RouterModule } from '@angular/router';
+import { StudentsContComponent } from './teacher/students/students.container';
+import { PageNotFoundComponent } from './fallback/page-not-found.component';
+import { HomeComponent } from './home/home.component';
+import { VmsContComponent } from './teacher/vms/vms.container';
 import { AuthGuard } from './helpers/auth.guard';
 import { Role } from './models/role.model';
 

@@ -19,7 +19,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { StudentsComponent } from './teacher/students/students.component';
-import { StudentsContComponent } from './teacher/students-cont.component';
+import { StudentsContComponent } from './teacher/students/students.container';
 import { AppRoutingModule } from './app-routing-module';
 import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';

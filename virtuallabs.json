@@ -2,19 +2,19 @@
   "students": [
     {
       "id": 1,
-      "serial": "265373",
       "name": "ALICINO",
       "firstName": "GIUSEPPE",
-      "courseId": 1,
-      "groupId": 0
+      "courseId": 0,
+      "serial": "123123",
+      "teamId": 1
     },
     {
       "id": 2,
-      "serial": "265171",
       "name": "MAGNANI",
       "firstName": "SIMONE",
-      "courseId": 1,
-      "groupId": 0
+      "courseId": 0,
+      "serial": "265171",
+      "teamId": 0
     }
   ],
   "courses": [
@@ -24,7 +24,7 @@
       "path": "applicazioni-internet"
     }
   ],
-  "groups": [
+  "teams": [
     {
       "id": 1,
       "name": "Calvary"

@@ -1,11 +1,11 @@
-import { Component, ViewChild, AfterViewInit, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import {map, startWith, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import {map, startWith, debounceTime, distinctUntilChanged, tap, first, takeUntil} from 'rxjs/operators';
 
 import { Student } from '../../models/student.model';
 
@@ -14,32 +14,39 @@ import { Student } from '../../models/student.model';
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.css']
 })
-export class StudentsComponent implements AfterViewInit, OnInit{
+export class StudentsComponent implements AfterViewInit, OnInit, OnDestroy{
 
   dataSource = new MatTableDataSource<Student>();
   selection = new SelectionModel<Student>(true, []);
   colsToDisplay = ["select", "serial", "name", "firstName", "team"];
-  filteredOptions: Observable<Student[]>;
   addStudentControl = new FormControl();
+  private destroy$: Subject<boolean> = new Subject<boolean>();
   @Output() addStudentsEvent = new EventEmitter<Student[]>();
   @Output() removeStudentsEvent = new EventEmitter<Student[]>();
+  @Output() searchStudentsEvent = new EventEmitter<string>();
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  @Input() studentsDB : Student[];
+  @Input() filteredStudents : Observable<Student[]>;
   @Input() set enrolledStudents( students: Student[] ) {
     this.dataSource.data = students;
   }
 
   /** Setting filter to autocomplete */
   ngOnInit() {
-    this.filteredOptions = this.addStudentControl.valueChanges
+    this.addStudentControl.valueChanges
     .pipe(
-      startWith(''),
-      debounceTime(400),
-      distinctUntilChanged(),
-      map(value => typeof value === 'string' ? value : value.serial),
-      map(serial => serial ? this._filter(serial) : this.studentsDB.slice())
-    );
+      takeUntil(this.destroy$),
+      // wait 300ms after each keystroke before considering the term
+      debounceTime(300),
+      // ignore new term if same as previous term
+      distinctUntilChanged()
+    ).subscribe((name: string) => this.searchStudentsEvent.emit(name));
+  }
+
+  /** Destroying subscription */
+  ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 
   /** Setting properties after ng containers are initialized */
@@ -62,8 +69,7 @@ export class StudentsComponent implements AfterViewInit, OnInit{
 
   /** The label for the checkbox on the passed row */
   checkboxLabel(row?: Student): string {
-    if (!row)
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    if (!row) return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.serial}`;
   }
 
@@ -84,11 +90,5 @@ export class StudentsComponent implements AfterViewInit, OnInit{
   /** Function to set the value displayed in input and mat-options */
   displayFn(student: Student): string{
     return student? `${student.name} ${student.firstName} (${student.serial})` : '';
-  }
-
-  /** My FormControl filter */
-  private _filter(value: string): Student[] {
-    const filterValue = value.toLowerCase();
-    return this.studentsDB.filter(s => s.firstName.toLowerCase().includes(filterValue));
   }
 }
