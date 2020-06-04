@@ -89,6 +89,6 @@ export class StudentsComponent implements AfterViewInit, OnInit, OnDestroy{
 
   /** Function to set the value displayed in input and mat-options */
   displayFn(student: Student): string{
-    return student? `${student.name} ${student.firstName} (${student.serial})` : '';
+    return student? Student.displayFn(student) : '';
   }
 }

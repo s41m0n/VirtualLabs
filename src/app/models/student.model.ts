@@ -21,4 +21,8 @@ export class Student {
         delete student.team;
         return student;
     }
-  }
+    
+    static displayFn(student : Student) : string {
+        return student.name + ' ' + student.firstName + ' (' + student.serial + ')';
+    }
+}

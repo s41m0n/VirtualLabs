@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 
 import { Student } from '../../models/student.model';
-import { SnackBarService } from '../../services/snack-bar.service';
 import { StudentService } from '../../services/student.service';
-import { first, switchMap, takeUntil } from 'rxjs/operators';
+import { first, switchMap, takeUntil, finalize } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-students-cont',
@@ -17,7 +17,7 @@ export class StudentsContComponent implements OnInit, OnDestroy{
   private searchTerms = new Subject<string>();
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private _snackBarService : SnackBarService,
+  constructor(private _toastrService : ToastrService,
     private _studentService : StudentService) {}
   
   ngOnInit(): void {
@@ -48,24 +48,24 @@ export class StudentsContComponent implements OnInit, OnDestroy{
 
   unenrollStudents(students: Student[]) {
     this._studentService.unenrollStudents(students)
-      .pipe(first())
-      .subscribe(_ => {
-        this.getEnrolled();
-        this._snackBarService.show(`😃 Successfully unenrolled student${students.length > 1 ? 's' : ''}`);
-    });
+      .pipe(
+        first(),
+        finalize(() => this.getEnrolled())
+      )
+      .subscribe();
   }
 
   enrollStudents(students: Student[]) {
     if(!students) return;
     if(students.some(x => typeof x === 'string')) {
-      this._snackBarService.show("⛔ Please select one student between the options");
-        return;
+      this._toastrService.error("Please select one student between the options");
+      return;
     }
     this._studentService.enrollStudents(students)
-      .pipe(first())
-      .subscribe(_ => {
-        this.getEnrolled();
-        this._snackBarService.show(`😃 Successfully enrolled student${students.length > 1? 's' : ''}`);
-    });
+      .pipe(
+        first(),
+        finalize(() => this.getEnrolled())
+      )
+      .subscribe();
   }
 }

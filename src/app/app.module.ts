@@ -17,7 +17,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete'; 
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { StudentsComponent } from './teacher/students/students.component';
 import { StudentsContComponent } from './teacher/students/students.container';
 import { AppRoutingModule } from './app-routing-module';
@@ -27,6 +26,7 @@ import { LoginDialogComponent } from './auth/login-dialog.component';
 import { MatCardModule } from '@angular/material/card';
 import { BasicAuthInterceptor } from './helpers/basic-auth.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -51,11 +51,14 @@ import { ErrorInterceptor } from './helpers/error.interceptor';
     MatAutocompleteModule,
     MatSortModule,
     MatPaginatorModule,
-    MatSnackBarModule,
     MatDialogModule,
     MatCardModule,
     AppRoutingModule,
     HttpClientModule,
+    ToastrModule.forRoot({
+      progressBar: true,
+      timeOut: 3000
+    })
   ],
   entryComponents: [
     LoginDialogComponent
