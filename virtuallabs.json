@@ -4,17 +4,17 @@
       "id": 1,
       "name": "ALICINO",
       "firstName": "GIUSEPPE",
-      "courseId": 0,
       "serial": "123123",
-      "teamId": 1
+      "teamId": 1,
+      "courseId": 0
     },
     {
       "id": 2,
       "name": "MAGNANI",
       "firstName": "SIMONE",
-      "courseId": 0,
+      "courseId": 2,
       "serial": "265171",
-      "teamId": 1
+      "teamId": 0
     },
     {
       "id": 3,
@@ -36,8 +36,13 @@
   "courses": [
     {
       "id": 1,
-      "name": "Applicazioni Internet",
-      "path": "applicazioni-internet"
+      "name": "Internet Applications",
+      "path": "internet-applications"
+    },
+    {
+      "id": 2,
+      "name": "Cloud computing",
+      "path": "cloud-computing"
     }
   ],
   "teams": [

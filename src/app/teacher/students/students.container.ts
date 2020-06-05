@@ -1,27 +1,37 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Student } from '../../models/student.model';
 import { StudentService } from '../../services/student.service';
 import { first, switchMap, takeUntil, finalize } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import { Course } from 'src/app/models/course.model';
+import { ActivatedRoute } from '@angular/router';
+import { CourseService } from 'src/app/services/course.service';
 
 @Component({
   selector: 'app-students-cont',
   templateUrl: './students.container.html',
 })
-export class StudentsContComponent implements OnInit, OnDestroy{
-
+export class StudentsContainer implements OnInit, OnDestroy{
+  course : Course;
   enrolledStudents: Student[] = [];
   filteredStudents : Observable<Student[]>;
   private searchTerms = new Subject<string>();
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private _toastrService : ToastrService,
-    private _studentService : StudentService) {}
+  constructor(private _studentService : StudentService,
+    private _courseService: CourseService,
+    private route: ActivatedRoute) {}
   
   ngOnInit(): void {
-    this.getEnrolled();
+    this.route.parent.params.pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this._courseService.getCourseByPath(params['coursename']).subscribe(res => {
+          this.course = res;
+          this.getEnrolled();
+        });
+      });
+    
     this.filteredStudents = this.searchTerms.pipe(
       takeUntil(this.destroy$),
       // switch to new search observable each time the term changes
@@ -35,19 +45,13 @@ export class StudentsContComponent implements OnInit, OnDestroy{
     this.destroy$.unsubscribe();
   }
 
-  private getEnrolled() {
-    this._studentService.getEnrolledStudents()
-    .pipe(first())
-    .subscribe(students => this.enrolledStudents = students);
-  }
-
   // Push a search term into the observable stream.
   searchStudents(name: string): void {
     this.searchTerms.next(name);
   }
 
   unenrollStudents(students: Student[]) {
-    this._studentService.unenrollStudents(students)
+    this._studentService.unenrollStudents(students, this.course)
       .pipe(
         first(),
         finalize(() => this.getEnrolled())
@@ -56,16 +60,18 @@ export class StudentsContComponent implements OnInit, OnDestroy{
   }
 
   enrollStudents(students: Student[]) {
-    if(!students) return;
-    if(students.some(x => typeof x === 'string')) {
-      this._toastrService.error("Please select one student between the options");
-      return;
-    }
-    this._studentService.enrollStudents(students)
+    this._studentService.enrollStudents(students, this.course)
       .pipe(
         first(),
         finalize(() => this.getEnrolled())
       )
       .subscribe();
+  }
+
+  private getEnrolled() {
+    if(!this.course) return;
+    this._studentService.getEnrolledStudents(this.course)
+    .pipe(first())
+    .subscribe(students => this.enrolledStudents = students);
   }
 }

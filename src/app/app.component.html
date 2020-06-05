@@ -13,38 +13,27 @@
 
 <!-- Second toolbar with current selected course name -->
 <mat-toolbar>
-  Internet Applications
+  Course: {{selectedCourseName}}
 </mat-toolbar>
 
 <!-- Application views area -->
-<mat-sidenav-container>
+<mat-sidenav-container [autosize]="true">
 
   <!-- Left sidenav to choose current view course -->
   <mat-sidenav #sidebar mode="side" opened="true" position="start">
     <div class="container">
       <mat-nav-list>
-        <mat-list-item [routerLink]="['teacher/course/internet-applications/students']" >Internet Applications</mat-list-item>
-        <mat-list-item [routerLink]="['teacher/course/system-and-device-programming/students']" >System and Device programming</mat-list-item>
+        <h4>Your available courses &nbsp;</h4>
+        <mat-divider></mat-divider>
+        <mat-list-item *ngFor="let option of courseList | async" (click)="selectCourse(option.name)" [routerLink]="[currentUser.role + '/courses/' + option.path]">
+          {{option.name}}
+        </mat-list-item>
       </mat-nav-list>
     </div>
   </mat-sidenav>
-
+  
   <!-- Current view content -->
   <mat-sidenav-content>
-    <!-- Tabs for the current view (Students / Teams / VMs) -->
-    <nav mat-tab-nav-bar>
-      <a mat-tab-link
-        *ngFor="let link of navLinks"
-        [routerLink]="link.path"
-        routerLinkActive #rla="routerLinkActive"
-        [active]="rla.isActive">
-        {{link.label}}
-      </a>
-    </nav>
-
-    <div class="container tab-content">
-      <router-outlet></router-outlet>
-    </div>
-    
+    <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>

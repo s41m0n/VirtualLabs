@@ -18,7 +18,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { StudentsComponent } from './teacher/students/students.component';
-import { StudentsContComponent } from './teacher/students/students.container';
+import { StudentsContainer } from './teacher/students/students.container';
 import { AppRoutingModule } from './app-routing-module';
 import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -27,13 +27,15 @@ import { MatCardModule } from '@angular/material/card';
 import { BasicAuthInterceptor } from './helpers/basic-auth.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { ToastrModule } from 'ngx-toastr';
+import { ProfessorComponent } from './teacher/professor.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     StudentsComponent,
-    StudentsContComponent,
-    LoginDialogComponent
+    StudentsContainer,
+    LoginDialogComponent,
+    ProfessorComponent
   ],
   imports: [
     BrowserModule,

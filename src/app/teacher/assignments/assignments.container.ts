@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-vms-cont',
-  templateUrl: './vms.container.html'
+  templateUrl: './assignments.container.html'
 })
-export class VmsContainer implements OnInit {
+export class AssignmentsContainer implements OnInit {
 
   constructor() { }
 
