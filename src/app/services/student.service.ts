@@ -7,6 +7,7 @@ import { tap, catchError, mergeMap, toArray, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Course } from '../models/course.model';
 
+/** StudentService class - responsible */
 @Injectable({
   providedIn: 'root'
 })
@@ -19,16 +20,6 @@ export class StudentService {
 
   constructor(private http: HttpClient,
     private _toastrService: ToastrService) {}
-
-  /** GET: get all students enrolled to course */
-  getEnrolledStudents(course : Course) : Observable<Student[]>{
-    return this.http.get<Student[]>(`${this.baseURL}/courses/${course.id}/students?_expand=team`)
-      .pipe(
-        //If I don't know a priori which data the server sends me --> map(res => res.map(r => Object.assign(new Student(), r))),
-        tap(() => console.log(`fetched enrolled ${course.name} students - getEnrolledStudents()`)),
-        catchError(this.handleError<Student[]>(`getEnrolledStudents(${course.name})`))
-      );
-  }
 
   /** PUT: enroll student to course */
   enrollStudents(students: Student[], course : Course): Observable<Student[]> {

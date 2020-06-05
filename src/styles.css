@@ -1,5 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body {margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-.tab-content {display: block; padding: 30px 30px 0 30px;}
+body {margin: 0; padding: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}
+.tab-content {
+    padding: 20px
+}
+.header{
+    width: 100%;
+    height: auto;
+    position: sticky; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    left: 0;
+    z-index: 9999;
+    width: 100%; /* Full width */
+}
+
+mat-sidenav-container{ 
+    height: 90%;
+    margin: 20px
+}

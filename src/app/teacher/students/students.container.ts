@@ -70,7 +70,7 @@ export class StudentsContainer implements OnInit, OnDestroy{
 
   private getEnrolled() {
     if(!this.course) return;
-    this._studentService.getEnrolledStudents(this.course)
+    this._courseService.getEnrolledStudents(this.course)
     .pipe(first())
     .subscribe(students => this.enrolledStudents = students);
   }

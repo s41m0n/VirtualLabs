@@ -1,26 +1,27 @@
 <!-- First toolbar with menu icon and app name -->
-<mat-toolbar color='primary'>
-  <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <a mat-button id='homeLink' [routerLink]="['home']">VirtualLabs</a>
+  <mat-toolbar color='primary' class="header">
+    <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <a mat-button id='homeLink' [routerLink]="['home']">VirtualLabs</a>
 
-  <span class="example-fill-remaining-space"></span>
-  <span *ngIf="currentUser">Welcome back, {{currentUser.email}}</span>
-  <button mat-button (click)="openLogin()" *ngIf="!currentUser" >Login</button>
-  <button mat-button (click)="logout()" *ngIf="currentUser" >Logout</button>
-</mat-toolbar>
+    <span class="example-fill-remaining-space"></span>
+    <span *ngIf="currentUser">Welcome back, {{currentUser.email}}</span>
+    <button mat-button (click)="openLogin()" *ngIf="!currentUser" >Login</button>
+    <button mat-button (click)="logout()" *ngIf="currentUser" >Logout</button>
+  </mat-toolbar>
 
-<!-- Second toolbar with current selected course name -->
-<mat-toolbar>
-  Course: {{selectedCourseName}}
-</mat-toolbar>
+
+  <!-- Second toolbar with current selected course name -->
+  <mat-toolbar class="subheader">
+    Course: {{selectedCourseName}}
+  </mat-toolbar>
 
 <!-- Application views area -->
 <mat-sidenav-container [autosize]="true">
 
   <!-- Left sidenav to choose current view course -->
-  <mat-sidenav #sidebar mode="side" opened="true" position="start">
+  <mat-sidenav #sidebar  class="navbar" mode="side" opened="true" position="start">
     <div class="container">
       <mat-nav-list>
         <h4>Your available courses &nbsp;</h4>
