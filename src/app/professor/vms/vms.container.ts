@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 
+/**
+ * VmsContainer
+ * 
+ * It displays the Vms view (WIP)
+ */
 @Component({
   selector: 'app-vms-cont',
-  templateUrl: './assignments.container.html'
+  templateUrl: './vms.container.html'
 })
-export class AssignmentsContainer implements OnInit {
+export class VmsContainer implements OnInit {
 
   constructor() { }
 

@@ -17,17 +17,20 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete'; 
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { StudentsComponent } from './teacher/students/students.component';
-import { StudentsContainer } from './teacher/students/students.container';
+import { StudentsComponent } from './professor/students/students.component';
+import { StudentsContainer } from './professor/students/students.container';
 import { AppRoutingModule } from './app-routing-module';
 import { HttpClientModule, HTTP_INTERCEPTORS }    from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LoginDialogComponent } from './auth/login-dialog.component';
 import { MatCardModule } from '@angular/material/card';
-import { BasicAuthInterceptor } from './helpers/basic-auth.interceptor';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthInterceptor } from './helpers/auth.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { ToastrModule } from 'ngx-toastr';
-import { ProfessorComponent } from './teacher/professor.component';
+import { ProfessorComponent } from './professor/professor.component';
+import { HomeComponent } from './home/home.component';
+import { PageNotFoundComponent } from './fallback/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,9 @@ import { ProfessorComponent } from './teacher/professor.component';
     StudentsComponent,
     StudentsContainer,
     LoginDialogComponent,
-    ProfessorComponent
+    ProfessorComponent,
+    HomeComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -57,6 +62,7 @@ import { ProfessorComponent } from './teacher/professor.component';
     MatCardModule,
     AppRoutingModule,
     HttpClientModule,
+    MatProgressSpinnerModule,
     ToastrModule.forRoot({
       progressBar: true,
       timeOut: 3000
@@ -66,7 +72,7 @@ import { ProfessorComponent } from './teacher/professor.component';
     LoginDialogComponent
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]

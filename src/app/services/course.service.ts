@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 
 import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -7,24 +7,42 @@ import { ToastrService } from 'ngx-toastr';
 import { Course } from '../models/course.model';
 import { Student } from '../models/student.model';
 
+/**
+ * CourseService service
+ * 
+ * This service is responsible of handling all the interactions with courses through rest api.
+ * 
+ */
 @Injectable({
   providedIn: 'root'
 })
-export class CourseService {
-
-  courses: Observable<Course[]>;
+export class CourseService{
   baseURL = 'api/courses';
 
   constructor(private http: HttpClient,
-    private _toastrService: ToastrService) {
-      this.courses = this.getCourses();
-    }
-
-  getCourseByPath(name: string) : Observable<Course> {
-    return this.courses.pipe(first(), map(res => res.find(x => x.path === name)));
+    private _toastrService: ToastrService) {}
+  
+  /**
+   * Function to retrieve a Course resource given a path
+   * 
+   * @param(path) the requested path 
+   */
+  getCourseByPath(path: string) : Observable<Course> {
+    return this.http.get<Course[]>(`${this.baseURL}?path_like=${path}&_limit=1`)
+      .pipe(
+        //If I don't know a priori which data the server sends me --> map(res => Object.assign(new Course(), res)),
+        //Take the first one (json-server does not support direct search, but we have to use _like query)
+        map(x => x.shift()),
+        tap(() => console.log(`fetched course by path ${path} - getCourses()`)),
+        catchError(this.handleError<Course>(`getCourseByPath(${path})`))
+      )
   }
 
-  /** GET: get all students enrolled to course */
+  /**
+   * Function to retrieve all students enroll to a Course
+   * 
+   * @param(course) the objective course  
+   */
   getEnrolledStudents(course : Course) : Observable<Student[]>{
     return this.http.get<Student[]>(`${this.baseURL}/${course.id}/students?_expand=team`)
       .pipe(
@@ -34,13 +52,14 @@ export class CourseService {
       );
   }
   
-  private getCourses() : Observable<Course[]>{
+  /**
+   * Function to retrieve the list of Courses available
+   */
+  getCourses() : Observable<Course[]>{
     return this.http.get<Course[]>(this.baseURL)
       .pipe(
-        tap(res => {
-          res.forEach(x => this.courses[x.path] = x);
-          console.log(`fetched courses - getCourses()`);}
-        ),
+        //If I don't know a priori which data the server sends me --> map(res => res.map(r => Object.assign(new Course(), r))),
+        tap(() => console.log(`fetched courses - getCourses()`)),
         catchError(this.handleError<Course[]>(`getCourses()`))
       )
   }

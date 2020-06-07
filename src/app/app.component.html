@@ -3,7 +3,7 @@
     <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <a mat-button id='homeLink' [routerLink]="['home']">VirtualLabs</a>
+    <a mat-button id='homeLink' [routerLink]="['/']">VirtualLabs</a>
 
     <span class="example-fill-remaining-space"></span>
     <span *ngIf="currentUser">Welcome back, {{currentUser.email}}</span>
@@ -14,27 +14,29 @@
 
   <!-- Second toolbar with current selected course name -->
   <mat-toolbar class="subheader">
-    Course: {{selectedCourseName}}
+    Course: {{selectedCourseName || '❓'}}
   </mat-toolbar>
 
 <!-- Application views area -->
 <mat-sidenav-container [autosize]="true">
 
   <!-- Left sidenav to choose current view course -->
-  <mat-sidenav #sidebar  class="navbar" mode="side" opened="true" position="start">
+  <mat-sidenav #sidebar class="navbar" mode="side" opened="true" position="start">
     <div class="container">
       <mat-nav-list>
         <h4>Your available courses &nbsp;</h4>
         <mat-divider></mat-divider>
-        <mat-list-item *ngFor="let option of courseList | async" (click)="selectCourse(option.name)" [routerLink]="[currentUser.role + '/courses/' + option.path]">
-          {{option.name}}
+        <mat-list-item *ngFor="let course of courseList | async" [routerLink]="[currentUser.role + '/courses/' + course.path]">
+          {{course.name}}
         </mat-list-item>
       </mat-nav-list>
     </div>
   </mat-sidenav>
   
-  <!-- Current view content -->
-  <mat-sidenav-content>
-    <router-outlet></router-outlet>
-  </mat-sidenav-content>
+    <!-- Current view content -->
+    <mat-sidenav-content>
+      <!--Display manually a PageNotFound component if the subview notifies an error (like /professor/courses/XXXX where XXXX does not exists)-->
+      <app-page-not-found *ngIf="isNotFound | async as what; else elseBlock" [what]="what"></app-page-not-found>
+      <ng-template #elseBlock><router-outlet ></router-outlet></ng-template>
+    </mat-sidenav-content>
 </mat-sidenav-container>

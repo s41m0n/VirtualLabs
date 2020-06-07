@@ -1,53 +1,56 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginDialogComponent } from './auth/login-dialog.component';
 import { AuthService } from './services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User } from './models/user.model';
-import { first, catchError, takeUntil, tap } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { Course } from './models/course.model';
 import { CourseService } from './services/course.service';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { BroadcasterService } from './services/broadcaster.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: './app.component.html'
 })
-export class AppComponent implements OnDestroy{
+export class AppComponent{
   title = 'ai20-lab05';
-  currentUser : User;
-  courseList: Observable<Course[]>;
-  selectedCourseName: string;
-  private destroy$: Subject<boolean> = new Subject<boolean>();
+  isNotFound : Observable<string>;        //Variable to keep track if a sub routes has signaled a NotFound error
+  currentUser : User;                     //Variable to keep track of the current user
+  courseList: Observable<Course[]>;       //Variable to keep track (asynchronously) of the courses
+  selectedCourseName: string;             //Variable to store the current selected course name (notified by sub routes via Broadcaster service)
 
+  //Unsubscribes are not performed here since alive till this root component is always alive and must be updated
   constructor(public dialog: MatDialog,
-    private _authService : AuthService,
+    private authService : AuthService,
+    private broadcaster : BroadcasterService,
     private route: ActivatedRoute,
     private courseService: CourseService,
     private router: Router) {
-      this._authService.currentUser.pipe(takeUntil(this.destroy$))
-        .subscribe((currentUser: User)  => {
-          this.currentUser = currentUser;
-          if(currentUser) this.courseList = this.courseService.courses.pipe(first());
-          else this.courseList = of([]);
+      //Subscribe to Broadcaster NotFound event
+      this.isNotFound = this.broadcaster.subscribeNotFound();
+      //Subscrive to current user and, if logged, refresh course list      
+      this.authService.currentUser.subscribe((user: User)  => {
+        this.currentUser = user;
+        this.courseList = user? this.courseService.getCourses().pipe(first()) : of([]);
       });
 
-      this.route.queryParams.pipe(takeUntil(this.destroy$))
-        .subscribe(queryParam => {
-          if(queryParam && queryParam.doLogin) this.openLogin();
-      });
-    }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+      //Subscribe to Broadcaster selected course subject
+      this.broadcaster.subscribeCourse().subscribe(course => this.selectedCourseName = course? course.name : null);
+      
+      //Subscribing to the route queryParam to check doLogin parameter
+      this.route.queryParams.subscribe(queryParam => queryParam && queryParam.doLogin? this.openLogin() : null);
   }
 
-  selectCourse(name: string) {
-    this.selectedCourseName = name;
-  }
-
+  /** Login Dialog show function
+   * 
+   *  This function opens a dialog window where the user
+   *  can perform login. When the dialog closes, a value is returned
+   *  in order to check whether the operation has been successfully 
+   *  executed (in that case the user is redirected to the previously desired page or root)
+   *  or not.
+   */
   openLogin() {
     const dialogRef = this.dialog.open(LoginDialogComponent);
     dialogRef.afterClosed()
@@ -58,9 +61,14 @@ export class AppComponent implements OnDestroy{
     });
   }
 
+  /** Logout function
+   * 
+   *  After calling all the proper functions to erase local data,
+   *  the user is redirected to the webservice root
+   */
   logout() {
-    this.selectedCourseName = '';
-    this._authService.logout();
+    this.authService.logout();
+    this.selectedCourseName = null;
     this.router.navigate(['/']);
   }
 }

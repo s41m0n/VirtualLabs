@@ -7,21 +7,28 @@ import { tap, catchError, mergeMap, toArray, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Course } from '../models/course.model';
 
-/** StudentService class - responsible */
+/** StudentService service
+ * 
+ *  This service is responsible of all the interaction with students resources through Rest api.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
 
-  baseURL : string = 'api/';
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
+  baseURL : string = 'api/students';
+  private httpOptions = {headers: new HttpHeaders({ 'Content-Type': 'application/json' })}; //Header to be used in POST/PUT
 
   constructor(private http: HttpClient,
     private _toastrService: ToastrService) {}
 
-  /** PUT: enroll student to course */
+  /**
+   * Function to enroll students to a specific Course
+   * Return value is ignored, since the we reload the entire list
+   * 
+   * @param(students) the list of students to be enrolled
+   * @param(course) the objective course
+   */
   enrollStudents(students: Student[], course : Course): Observable<Student[]> {
     return from(students).pipe(
       mergeMap((student : Student) => {
@@ -30,10 +37,9 @@ export class StudentService {
           this._toastrService.error(`${student} is not a valid Student, please select one from the options`, 'Error 😅');
           return of(null);
         }
-        const url = `${this.baseURL}/students/${student.id}`;
         // Faking enroll
         student.courseId = course.id;
-        return this.http.put<Student>(url, Student.export(student), this.httpOptions).pipe(
+        return this.http.put<Student>(`${this.baseURL}/${student.id}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
             this._toastrService.success(`Enrolled ${Student.displayFn(s)} to ${course.name}`, 'Congratulations 😃');
             console.log(`enrolled ${Student.displayFn(s)} - enrollStudents()`);
@@ -45,15 +51,20 @@ export class StudentService {
     );
   };
 
-  /** PUT: unenroll student from the course */
+  /**
+   * Function to unenroll students from a specific course.
+   * Return value is ignored, since the we reload the entire list
+   * 
+   * @param(students) the list of students to be unenrolled 
+   * @param(course) the objective course
+   */
   unenrollStudents(students: Student[], course : Course): Observable<Student[]> {
     return from(students).pipe(
       mergeMap(student => {
-        const url = `${this.baseURL}/students/${student.id}`;
         // Faking unenroll, remove also the team
         student.courseId = 0; 
         student.teamId = 0;
-        return this.http.put<Student>(url, Student.export(student), this.httpOptions).pipe(
+        return this.http.put<Student>(`${this.baseURL}/${student.id}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
             this._toastrService.success(`Unenrolled ${Student.displayFn(s)} from ${course.name}`, 'Congratulations 😃')
             console.log(`unenrolled ${Student.displayFn(s)} - unenrollStudents()`);
@@ -65,13 +76,18 @@ export class StudentService {
     );
   }
 
-  /* GET students whose name contains search term */
+  /**
+   * Function to retrieve all students whose name matches a specific string
+   * 
+   * @param(name) the string which should be contained in the student name
+   */
   searchStudents(name: string): Observable<Student[]> {
+    //Checking if it is actually a string and does not have whitespaces in the middle (if it has them at beginning or end, trim)
     if (typeof name !== 'string' || !(name = name.trim()) || name.indexOf(' ') >= 0) {
-      // if not search term, return empty student array.
       return of([]);
     }
-    return this.http.get<Student[]>(`${this.baseURL}/students?name_like=${name}`).pipe(
+    return this.http.get<Student[]>(`${this.baseURL}?name_like=${name}`).pipe(
+      //If I don't know a priori which data the server sends me --> map(res => res.map(r => Object.assign(new Student(), r))),
       tap(x => console.log(`found ${x.length} results matching ${name} - searchStudents()`)),
       catchError(this.handleError<Student[]>(`searchStudents(${name})`, [], false))
     );
@@ -97,9 +113,11 @@ export class StudentService {
 
   /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ UNUSED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-  /** GET: get all students */
-  getStudents() : Observable<Student[]>{
-    return this.http.get<Student[]>(`${this.baseURL}/students?_expand=team`)
+  /**
+   * Function to retrieve all students (including their teams if any)
+   */
+  private getStudents() : Observable<Student[]>{
+    return this.http.get<Student[]>(`${this.baseURL}?_expand=team`)
       .pipe(
         //If I don't know a priori which data the server sends me --> map(res => res.map(r => Object.assign(new Student(), r))),
         tap(_ => console.log('fetched students - getStudents()')),
@@ -107,11 +125,15 @@ export class StudentService {
       );
   }
   
-  /** POST: create students */
-  createStudents(students: Student[]) : Observable<Student[]> {
+  /**
+   * Function to create students
+   * 
+   * @param(students) the students to be created
+   */
+  private createStudents(students: Student[]) : Observable<Student[]> {
     return from(students).pipe(
       mergeMap(student => {
-        return this.http.post<Student>(`${this.baseURL}/students`, Student.export(student), this.httpOptions).pipe(
+        return this.http.post<Student>(`${this.baseURL}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
             this._toastrService.success(`Created ${Student.displayFn(s)}`, 'Congratulations 😃');
             console.log(`created student ${Student.displayFn(s)} - createStudent()`);
@@ -123,8 +145,12 @@ export class StudentService {
     );
   }
 
-  /** DELETE: delete student */
-  deleteStudents(students: Student[]) {
+  /**
+   * Function to delete students
+   * 
+   * @param(students) the students to be deleted
+   */
+  private deleteStudents(students: Student[]) {
     return from(students).pipe(
       mergeMap(student => {
         return this.http.delete(`${this.baseURL}/students/${student.id}`).pipe(
