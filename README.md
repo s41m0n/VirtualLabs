@@ -83,3 +83,9 @@ By clicking the menu icon, I expect the sidenav to open, showing all the availab
 ## Screenshots
 
 Available at `screenshots` directory.
+
+
+/**************************** NEWS TO ADD
+
+json-auth =>  node_modules/json-server-auth/dist/bin.js virtuallabs.json -r virtuallabs_routes.json
+app => ng serve OR ng serve --ssl
