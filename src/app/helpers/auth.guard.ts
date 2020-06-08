@@ -20,12 +20,14 @@ export class AuthGuard implements CanActivate {
         // Check if the user is logged
         if(!currentUser) {
             // not logged in so redirect to login page with the return url
+            console.log('This route requires login!');
             this.router.navigate(['/'], { queryParams: { returnUrl: state.url, 'doLogin': true } });
             return false;
         }
         // check if route is restricted by role
         if (route.data.roles && !route.data.roles.includes(currentUser.role)) {
             // role not authorised so redirect to home page
+            console.log(`Unprivileged user (${currentUser.email} is a ${currentUser.role}) for the route ${state.url}!`);
             this.router.navigate(['/']);
             return false;
         }

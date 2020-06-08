@@ -19,6 +19,7 @@ I tried to dig deeper the proposed arguments and solution to develop a version m
     * Course loaded => then the AppComponent can retrieve it and display the name
     * Course loaded => then the nephews can retrieve it and get info about it like the enrolled students et, .
     * EntityNotFound => then the AppComponent can switch view from the current tab to a dynamic NotFound page
+* Dynamic role-routes binding (for the sidenav)
 
 I hope my effort would be positively considered, since I really liked those arguments and I wanted to prove not only that I've understood them, but also that with a bit more effort I was able to achieve a (in my opinion) notable result.s
 

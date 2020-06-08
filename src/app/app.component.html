@@ -3,7 +3,7 @@
     <button mat-icon-button aria-label="Menu icon" (click)="sidebar.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <a mat-button id='homeLink' [routerLink]="['/']">VirtualLabs</a>
+    <a mat-button [routerLink]="['/']"><h2>VirtualLabs</h2></a>
 
     <span class="example-fill-remaining-space"></span>
     <span *ngIf="currentUser">Welcome back, {{currentUser.email}}</span>
@@ -24,8 +24,8 @@
   <mat-sidenav #sidebar class="navbar" mode="side" opened="true" position="start">
     <div class="container">
       <mat-nav-list>
-        <h4>Your available courses &nbsp;</h4>
-        <mat-divider></mat-divider>
+        <h3 matSubheader>Your available courses &nbsp;</h3>
+        <mat-divider>CIao</mat-divider>
         <mat-list-item *ngFor="let course of courseList | async" [routerLink]="[currentUser.role + '/courses/' + course.path]">
           {{course.name}}
         </mat-list-item>
