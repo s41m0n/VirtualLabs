@@ -65,7 +65,8 @@ import { PageNotFoundComponent } from './fallback/page-not-found.component';
     MatProgressSpinnerModule,
     ToastrModule.forRoot({
       progressBar: true,
-      timeOut: 3000
+      timeOut: 3000,
+      preventDuplicates: true
     })
   ],
   entryComponents: [

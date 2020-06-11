@@ -20,7 +20,7 @@ export class CourseService{
   baseURL = 'api/courses';
 
   constructor(private http: HttpClient,
-    private _toastrService: ToastrService) {}
+    private toastrService: ToastrService) {}
   
   /**
    * Function to retrieve a Course resource given a path
@@ -74,7 +74,7 @@ export class CourseService{
     return (error: any): Observable<T> => {
       const why = `${message} ${operation}: ${error}`;
       
-      if(show) this._toastrService.error(why, 'Error 😅');
+      if(show) this.toastrService.error(why, 'Error 😅');
       console.log(why);
 
       // Let the app keep running by returning an empty result.

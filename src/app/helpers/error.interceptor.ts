@@ -4,6 +4,10 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { AuthService } from '../services/auth.service';
+import * as moment from 'moment';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { User } from '../models/user.model';
 
 /** ErrorInterceptor service
  * 
@@ -12,18 +16,22 @@ import { AuthService } from '../services/auth.service';
  */
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService,
+        private router: Router,
+        private toastrService: ToastrService) {}
 
     /** Method to intercept the error response, check if 401 and throw an error */
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {
-            if (err.status === 401 && this.authService.currentUserValue) {
+            const currentUser = this.authService.currentUserValue;
+            if (err.status === 401 && currentUser) {
                 // auto logout if 401 response returned from api
-                this.authService.logout();
-                location.reload(true);
-            }
-            
-            const error = err.error.message || err.statusText;
+                if(moment().isAfter(User.getTokenExpireTime(currentUser.accessToken))) this.toastrService.info(`Your authentication token expired. Login again please`, 'Sorry 😰');
+                else this.toastrService.info(`You requested a resource you don't have access to`, 'Sorry 😰');
+                this.authService.logout(false);
+                this.router.navigate(['/'], { queryParams: { returnUrl: location.pathname, 'doLogin': true } });
+            }    
+            const error = err.error.message || err.statusText;    
             return throwError(error);
         }))
     }

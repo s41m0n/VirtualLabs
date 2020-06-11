@@ -20,7 +20,7 @@ export class StudentService {
   private httpOptions = {headers: new HttpHeaders({ 'Content-Type': 'application/json' })}; //Header to be used in POST/PUT
 
   constructor(private http: HttpClient,
-    private _toastrService: ToastrService) {}
+    private toastrService: ToastrService) {}
 
   /**
    * Function to enroll students to a specific Course
@@ -34,14 +34,14 @@ export class StudentService {
       mergeMap((student : Student) => {
         //Checking if ADD has been pressed without selecting a student (or modifying the selected one)
         if(typeof student === 'string') {
-          this._toastrService.error(`${student} is not a valid Student, please select one from the options`, 'Error 😅');
+          this.toastrService.error(`${student} is not a valid Student, please select one from the options`, 'Error 😅');
           return of(null);
         }
         // Faking enroll
         student.courseId = course.id;
         return this.http.put<Student>(`${this.baseURL}/${student.id}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
-            this._toastrService.success(`Enrolled ${Student.displayFn(s)} to ${course.name}`, 'Congratulations 😃');
+            this.toastrService.success(`Enrolled ${Student.displayFn(s)} to ${course.name}`, 'Congratulations 😃');
             console.log(`enrolled ${Student.displayFn(s)} - enrollStudents()`);
           }),
           catchError(this.handleError<Student>(`enrollStudents(${Student.displayFn(student)}, ${course.name})`))
@@ -66,7 +66,7 @@ export class StudentService {
         student.teamId = 0;
         return this.http.put<Student>(`${this.baseURL}/${student.id}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
-            this._toastrService.success(`Unenrolled ${Student.displayFn(s)} from ${course.name}`, 'Congratulations 😃')
+            this.toastrService.success(`Unenrolled ${Student.displayFn(s)} from ${course.name}`, 'Congratulations 😃')
             console.log(`unenrolled ${Student.displayFn(s)} - unenrollStudents()`);
           }),
           catchError(this.handleError<Student>(`unenrollStudents(${Student.displayFn(student)}, ${course.name})`))
@@ -103,7 +103,7 @@ export class StudentService {
     return (error: any): Observable<T> => {
       const why = `${message} ${operation}: ${error}`;
       
-      if(show) this._toastrService.error(why, 'Error 😅');
+      if(show) this.toastrService.error(why, 'Error 😅');
       console.log(why);
 
       // Let the app keep running by returning an empty result.
@@ -135,7 +135,7 @@ export class StudentService {
       mergeMap(student => {
         return this.http.post<Student>(`${this.baseURL}`, Student.export(student), this.httpOptions).pipe(
           tap(s => {
-            this._toastrService.success(`Created ${Student.displayFn(s)}`, 'Congratulations 😃');
+            this.toastrService.success(`Created ${Student.displayFn(s)}`, 'Congratulations 😃');
             console.log(`created student ${Student.displayFn(s)} - createStudent()`);
           }),
           catchError(this.handleError<Student>(`createStudent(${Student.displayFn(student)})`))
@@ -155,7 +155,7 @@ export class StudentService {
       mergeMap(student => {
         return this.http.delete(`${this.baseURL}/students/${student.id}`).pipe(
           tap(() => {
-            this._toastrService.success(`Deleted ${Student.displayFn(student)}`, 'Congratulations 😃');
+            this.toastrService.success(`Deleted ${Student.displayFn(student)}`, 'Congratulations 😃');
             console.log(`Deleted student ${Student.displayFn(student)} - deleteStudent()`);
           }),
           catchError(this.handleError<Student>(`deleteStudent(${Student.displayFn(student)})`))

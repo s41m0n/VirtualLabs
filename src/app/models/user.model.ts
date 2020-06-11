@@ -18,4 +18,13 @@ export class User {
         this.accessToken = accessToken;
         this.role = role;
     }
+
+    /**
+     * Static generic utility function to return expire date from a token
+     * 
+     * @param(accessToken) the token to be parsed
+     */
+    static getTokenExpireTime(accessToken : string) : number {
+        return JSON.parse(atob(accessToken.split('.')[1])).exp;
+    }
   }

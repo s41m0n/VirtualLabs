@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { User } from '../models/user.model';
 import { Role } from '../models/role.model';
 import { ToastrService } from 'ngx-toastr';
+import * as moment from 'moment';
 
 /**
  * AuthService service
@@ -25,9 +26,16 @@ export class AuthService {
   httpOptions = {headers: new HttpHeaders({ 'Content-Type': 'application/json'})};
 
   constructor(private http: HttpClient,
-    private _toastrService: ToastrService) {
+    private toastrService: ToastrService) {
     //Check if logged user via localStorage and set it;
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
+    let user = JSON.parse(localStorage.getItem('currentUser'));
+    //Check if accessToken expired
+    if(user && moment().isAfter(User.getTokenExpireTime(user.accessToken))) {
+      localStorage.removeItem('currentUser');
+      this.toastrService.info(`Your authentication token expired. Login again please`, 'Sorry 😰');
+      user = null;
+    }
+    this.currentUserSubject = new BehaviorSubject<User>(user);
     this.currentUser = this.currentUserSubject.asObservable();
   }
   
@@ -56,11 +64,11 @@ export class AuthService {
         return authResult;
       }),
       tap(() => {
-        this._toastrService.success(`Hi ${email}`, 'Awesome 😃');
+        this.toastrService.success(`Hi ${email}`, 'Awesome 😃');
         console.log(`logged ${email}`);
       }),
       catchError(err => {
-        this._toastrService.error('Authentication failed', 'Error 😅');
+        this.toastrService.error('Authentication failed', 'Error 😅');
         return throwError(err);
       })
     );
@@ -71,10 +79,10 @@ export class AuthService {
    * 
    * Remove user from local storage and emits a new event with a null user.
    */
-  logout() {
+  logout(showMsg: boolean = true) {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
-    this._toastrService.success(`Logout with success`, 'Awesome 😃');
+    if(showMsg) this.toastrService.success(`Logout with success`, 'Awesome 😃');
     console.log(`logged out`);
   }
 }
